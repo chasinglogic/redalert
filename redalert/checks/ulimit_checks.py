@@ -18,3 +18,6 @@ class UlimitCheck:
 
 class AddressSizeCheck(UlimitCheck):
     ulimit = resource.RLIMIT_AS
+
+class OpenFilesCheck(UlimitCheck):
+    ulimit = resource.RLIMIT_NOFILE
