@@ -6,7 +6,7 @@ from .ulimit_checks import AddressSizeCheck, UlimitCheck
 
 
 def get_check(name, args=None):
-    '''Return the appropriate check instance based on test name.'''
+    """Return the appropriate check instance based on test name."""
     if args is None:
         args = {}
 
