@@ -3,10 +3,11 @@
 from .exc import CheckFailure
 from .file_exists import FileExistsCheck, FileNotExistsCheck
 from .ulimit_checks import AddressSizeCheck, UlimitCheck
+from .python_module_version import PythonModuleCheck
 
 
 def get_check(name, args=None):
-    '''Return the appropriate check instance based on test name.'''
+    """Return the appropriate check instance based on test name."""
     if args is None:
         args = {}
 
@@ -22,5 +23,7 @@ def get_check(name, args=None):
     elif name == 'compile-gcc':
         from .compile_gcc import CompileGccCheck
         return CompileGccCheck(**args)
+    elif name == 'python-module-version':
+        return PythonModuleCheck(**args)
 
     raise NotImplementedError
