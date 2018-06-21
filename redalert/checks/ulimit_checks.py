@@ -31,3 +31,6 @@ class AddressSizeCheck(UlimitCheck):
     """Check that the ulimit Address Size is equal to or greater than the given
     value."""
     ulimit = resource.RLIMIT_AS
+
+class OpenFilesCheck(UlimitCheck):
+    ulimit = resource.RLIMIT_NOFILE
