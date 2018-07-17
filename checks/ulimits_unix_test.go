@@ -6,9 +6,7 @@ import (
 )
 
 func TestEveryType(t *testing.T) {
-
 	for limitName, _ := range limitsByName {
-
 		err := UlimitChecker{IsHard: false, Item: limitName, Limit: 0}.Check()
 		if err != nil {
 			t.Error(err)
@@ -21,7 +19,6 @@ func TestEveryType(t *testing.T) {
 // 1024/4096 in sample RHEL 6 shell).
 //
 func TestSoftHard(t *testing.T) {
-
 	var rLimit syscall.Rlimit
 	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
 	if err != nil {
@@ -42,7 +39,6 @@ func TestSoftHard(t *testing.T) {
 
 }
 func TestArgBuilding(t *testing.T) {
-
 	arged, err := UlimitChecker{}.FromArgs(map[string]interface{}{"item": "as", "type": "soft", "limit": 1024})
 	if err != nil {
 		t.Error(err)
@@ -120,4 +116,23 @@ func TestFailure(t *testing.T) {
 	if err == nil {
 		t.Errorf("Didn't get err when expected one: %+v", checker)
 	}
+}
+
+func TestLegacyTypes(t *testing.T) {
+  checker, _ := availableChecks["open-files"](map[string]interface{}{"value": 1024})
+  equivalentChecker := UlimitChecker{IsHard: true, Item: "nofile", Limit: 1024, Type: "hard"}
+
+  if checker != equivalentChecker {
+		t.Errorf("Legacy conversion failed (%+v != %+v)", checker, equivalentChecker)
+	}
+
+  checker, _ = availableChecks["address-size"](map[string]interface{}{"value": 1024})
+  equivalentChecker = UlimitChecker{IsHard: true, Item: "as", Limit: 1024, Type: "hard"}
+
+  if checker != equivalentChecker {
+		t.Errorf("Legacy conversion failed (%+v != %+v)", checker, equivalentChecker)
+	}
+
+
+
 }

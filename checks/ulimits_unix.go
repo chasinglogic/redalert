@@ -17,14 +17,19 @@ import (
 // Arguments:
 //   - item (required): A string value representing the type of limit to check
 //   - limit (required): Numerical value representing the minimum value to be tested
-//   - type (optional): "hard" or "soft" with a default of "hard"
+//   - type: "hard" or "soft" with a default of "hard"
 //
 // Notes:
-//   - Windows is not supported
 //   - "item" strings are from http://www.linux-pam.org/Linux-PAM-html/sag-pam_limits.html
-//     - Not all are supported. See `limitsByName` map below for full list
+//     - The following values are supported:
+//       - core
+//       - data
+//       - fsize
+//       - nofile
+//       - stack
+//       - cpu
+//       - as
 //   - "limit" can be '-1' to represent that the resource limit should be unlimited
-//
 type UlimitChecker struct {
 	Item   string
 	Limit  uint64
@@ -33,7 +38,6 @@ type UlimitChecker struct {
 }
 
 // Map symbolic limit names to rlimit constants
-//
 var limitsByName = map[string]int{
 	"core":   syscall.RLIMIT_CORE,
 	"data":   syscall.RLIMIT_DATA,
@@ -45,9 +49,7 @@ var limitsByName = map[string]int{
 }
 
 // Check if a ulimit is high enough
-//
 func (uc UlimitChecker) Check() error {
-
 	var rLimit syscall.Rlimit
 	err := syscall.Getrlimit(limitsByName[uc.Item], &rLimit)
 
@@ -75,17 +77,6 @@ func (uc UlimitChecker) Check() error {
 
 // FromArgs will populate the UlimitChecker with the args given in the tests YAML
 // config
-//
-// yaml inputs:
-// item (required)
-// limit (required)
-// type ("soft"/"hard" - optional, default hard)
-//
-// Checker members:
-// Item string
-// Limit uint64
-// IsHard bool
-// Type string
 func (uc UlimitChecker) FromArgs(args map[string]interface{}) (Checker, error) {
 	if err := requiredArgs(args, "item"); err != nil {
 		return nil, err
@@ -118,4 +109,19 @@ func init() {
 		return UlimitChecker{}.FromArgs(args)
 	}
 
+	// Legacy greenbay types
+  availableChecks["open-files"] = func(args map[string]interface{}) (Checker, error) {
+    args["item"] = "nofile"
+    args["type"] = "hard"
+    args["limit"] = args["value"]
+    delete(args,"value")
+		return UlimitChecker{}.FromArgs(args)
+	}
+  availableChecks["address-size"] = func(args map[string]interface{}) (Checker, error) {
+    args["item"] = "as"
+    args["type"] = "hard"
+    args["limit"] = args["value"]
+    delete(args,"value")
+		return UlimitChecker{}.FromArgs(args)
+	}
 }
