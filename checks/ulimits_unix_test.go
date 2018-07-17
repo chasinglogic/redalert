@@ -17,7 +17,6 @@ func TestEveryType(t *testing.T) {
 // The open files limit is a good limit for this test because it commonly
 // has different soft/hard limits (4864/unlimited in sample MacOS shell,
 // 1024/4096 in sample RHEL 6 shell).
-//
 func TestSoftHard(t *testing.T) {
 	var rLimit syscall.Rlimit
 	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
@@ -109,7 +108,6 @@ func TestArgBuilding(t *testing.T) {
 
 // The stack size limit is a good limit for this test because it commonly
 // has a non-inifinity hard limit (65532 in sample MacOS/RHEL 6 shells).
-//
 func TestFailure(t *testing.T) {
 	checker := UlimitChecker{IsHard: false, Item: "stack", Limit: syscall.RLIM_INFINITY}
 	err := checker.Check()
